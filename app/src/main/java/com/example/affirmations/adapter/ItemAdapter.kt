@@ -15,16 +15,24 @@ class ItemAdapter(
     private val dataset: List<Affirmation>
 ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
-    class ItemViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    private var itemClickListener: ItemClickListener? = null
+
+    fun setItemClickListener(listener: ItemClickListener) {
+        itemClickListener = listener
+    }
+
+    interface ItemClickListener {
+        fun onItemClick(itemText: String)
+    }
+
+    class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val textView: TextView = view.findViewById(R.id.item_title)
         val imageView: ImageView = view.findViewById(R.id.item_image)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        // create a new view
         val adapterLayout = LayoutInflater.from(parent.context)
             .inflate(R.layout.list_item, parent, false)
-
         return ItemViewHolder(adapterLayout)
     }
 
@@ -32,6 +40,10 @@ class ItemAdapter(
         val item = dataset[position]
         holder.textView.text = context.resources.getString(item.stringResourceId)
         holder.imageView.setImageResource(item.imageResourceId)
+        holder.itemView.setOnClickListener {
+            itemClickListener?.onItemClick(holder.textView.text.toString())
+        }
     }
+
     override fun getItemCount() = dataset.size
 }
